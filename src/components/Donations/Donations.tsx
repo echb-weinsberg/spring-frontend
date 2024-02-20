@@ -134,7 +134,7 @@ export function Donations() {
   return (
     <>
       <Flex pb={20} justify={'space-between'}>
-        <Title>Spendeineingänge</Title>
+        <Title>Spendeneingänge</Title>
         <Group>
           <Button leftSection={<IconPlus />} onClick={addEntryHandlers.open}>
             Hinzufügen

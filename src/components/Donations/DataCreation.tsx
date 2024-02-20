@@ -16,7 +16,7 @@ export function DonorDataCreation({
   onCancel: () => void;
 }) {
   const donors = useDonors();
-  const { mutateDonor } = useAddDonorWithFormValues();
+  const { mutateDonor, isLoading } = useAddDonorWithFormValues();
   const updateDonor = useUpdateDonor();
   const [formValues, setFormValues] = useState<DonorFormValues>({
     name: data.attributes.name ?? '',
@@ -52,9 +52,7 @@ export function DonorDataCreation({
         (donor) =>
           donor.attributes.name === (formValues?.name ?? null) &&
           donor.attributes.surname === (formValues?.surname ?? null) &&
-          donor.attributes.street === (formValues?.street ?? null) &&
-          donor.attributes.plz === (formValues?.plz ?? null) &&
-          donor.attributes.city === (formValues?.city ?? null)
+          donor.attributes.plz === (formValues?.plz ?? null)
       ),
     [formValues, donors.data]
   );
@@ -87,6 +85,7 @@ export function DonorDataCreation({
       onCancel={onCancel}
       cancelButtonTitle="Überspringen"
       onValuesChangeCallback={setFormValues}
+      isLoading={isLoading}
     />
   );
 }

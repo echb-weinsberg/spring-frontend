@@ -16,6 +16,7 @@ import { DatePickerInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import dayjs from 'dayjs';
+import { useState } from 'react';
 
 type AddDonationModalProps = {
   initialData?: ListItemDonation;
@@ -25,6 +26,8 @@ export function AddDonationModal({ initialData, ...props }: AddDonationModalProp
   const addDonation = useAddDonation();
   const updateDonation = useUpdateDonation();
   const donors = useDonors();
+
+  const [isAddingDonation, setIsAddingDonation] = useState(false);
 
   const form = useForm({
     initialValues: {
@@ -42,6 +45,7 @@ export function AddDonationModal({ initialData, ...props }: AddDonationModalProp
       date: dayjs(form.values.date).format('YYYY-MM-DD'),
       donor: form.values.donor,
     };
+    setIsAddingDonation(true);
     if (initialData) {
       updateDonation.mutate(
         [
@@ -57,9 +61,11 @@ export function AddDonationModal({ initialData, ...props }: AddDonationModalProp
               message: 'Spendeneingang wurde erfolgreich aktualisiert',
             });
             form.reset();
+            setIsAddingDonation(false);
             props.onClose();
           },
           onError: () => {
+            setIsAddingDonation(false);
             notifications.show({
               title: 'Fehler',
               message: 'Spendeneingang konnte nicht aktualisiert werden',
@@ -79,9 +85,11 @@ export function AddDonationModal({ initialData, ...props }: AddDonationModalProp
               message: 'Spendeneingang wurde erfolgreich angelegt',
             });
             form.reset();
+            setIsAddingDonation(false);
             props.onClose();
           },
           onError: () => {
+            setIsAddingDonation(false);
             notifications.show({
               title: 'Fehler',
               message: 'Spendeneingang konnte nicht angelegt werden',
@@ -137,7 +145,9 @@ export function AddDonationModal({ initialData, ...props }: AddDonationModalProp
         </Grid.Col>
         <Grid.Col>
           <Flex justify={'end'}>
-            <Button onClick={handleSave}>Speichern</Button>
+            <Button loading={isAddingDonation} onClick={handleSave}>
+              Speichern
+            </Button>
           </Flex>
         </Grid.Col>
       </Grid>

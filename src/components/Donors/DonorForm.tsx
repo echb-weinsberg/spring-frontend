@@ -20,6 +20,7 @@ type DonorFormProps = {
   cancelButtonTitle?: string;
   saveButtonTitle?: string;
   onValuesChangeCallback?: (formValues: DonorFormValues) => void;
+  isLoading: boolean;
 };
 
 export type DonorFormValues = {
@@ -44,6 +45,7 @@ export function DonorForm({
   cancelButtonTitle,
   saveButtonTitle,
   onValuesChangeCallback,
+  isLoading,
 }: DonorFormProps) {
   const form = useForm<DonorFormValues>({
     onValuesChange: (formValues) =>
@@ -65,7 +67,7 @@ export function DonorForm({
   });
 
   useEffect(() => {
-    form.setInitialValues({
+    const initialFormValues = {
       title: initialData?.attributes.title ?? '',
       name: initialData?.attributes.name ?? '',
       surname: initialData?.attributes.surname ?? '',
@@ -78,7 +80,11 @@ export function DonorForm({
       mandateNumber: initialData?.attributes.mandateNumber ?? '',
       wantsReceipt: initialData?.attributes.wantReceipt?.toString() ?? 'true',
       note: initialData?.attributes.note ?? '',
-    });
+    };
+    form.setInitialValues(initialFormValues);
+    if (onValuesChangeCallback) {
+      onValuesChangeCallback(initialFormValues);
+    }
     form.reset();
   }, [initialData]);
 
@@ -130,7 +136,7 @@ export function DonorForm({
           <Grid.Col span={4}>
             <TagsInput
               placeholder="IBAN eingeben und mit Enter bestätigen"
-              label="IBANs"
+              label="IBANs (mit Enter bestätigen)"
               {...form.getInputProps('ibans')}
             />
           </Grid.Col>
@@ -158,7 +164,9 @@ export function DonorForm({
       <Flex justify={'end'} mt={10}>
         <Group>
           <Button onClick={onCancel}>{cancelButtonTitle ?? 'Abbrechen'}</Button>
-          <Button onClick={() => handleSave(form.values)}>{saveButtonTitle ?? 'Speichern'}</Button>
+          <Button loading={isLoading} onClick={() => handleSave(form.values)}>
+            {saveButtonTitle ?? 'Speichern'}
+          </Button>
         </Group>
       </Flex>
     </>

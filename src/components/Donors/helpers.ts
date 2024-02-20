@@ -3,13 +3,16 @@ import { DonorRequestDataTitleEnum } from '@/generated';
 import { DonorFormValues } from './DonorForm';
 import { notifications } from '@mantine/notifications';
 import { useLoggedInUser } from '@/api/queries/users';
+import { useState } from 'react';
 
 export function useAddDonorWithFormValues(successCallback?: () => void) {
   const loggedInUser = useLoggedInUser();
   const updateDonor = useUpdateDonor();
   const addDonor = useAddDonor();
+  const [isLoading, setIsLoading] = useState(false);
 
   const mutateDonor = (formValues: DonorFormValues, donorToUpdate?: number) => {
+    setIsLoading(true);
     const payload = {
       title: (formValues.title as DonorRequestDataTitleEnum) ?? undefined,
       name: formValues.name,
@@ -35,6 +38,7 @@ export function useAddDonorWithFormValues(successCallback?: () => void) {
         ],
         {
           onSuccess: () => {
+            setIsLoading(false);
             notifications.show({
               title: 'Erfolg',
               message: 'Spender wurde erfolgreich aktualisiert',
@@ -42,6 +46,7 @@ export function useAddDonorWithFormValues(successCallback?: () => void) {
             if (successCallback) successCallback();
           },
           onError: () => {
+            setIsLoading(false);
             notifications.show({
               title: 'Fehler',
               message: 'Spender konnte nicht aktualisiert werden',
@@ -56,6 +61,7 @@ export function useAddDonorWithFormValues(successCallback?: () => void) {
         },
         {
           onSuccess: () => {
+            setIsLoading(false);
             notifications.show({
               title: 'Erfolg',
               message: 'Spender wurde erfolgreich angelegt',
@@ -63,6 +69,7 @@ export function useAddDonorWithFormValues(successCallback?: () => void) {
             if (successCallback) successCallback();
           },
           onError: () => {
+            setIsLoading(false);
             notifications.show({
               title: 'Fehler',
               message: 'Spender konnte nicht angelegt werden',
@@ -73,5 +80,5 @@ export function useAddDonorWithFormValues(successCallback?: () => void) {
     }
   };
 
-  return { mutateDonor };
+  return { mutateDonor, isLoading };
 }

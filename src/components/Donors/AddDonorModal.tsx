@@ -10,7 +10,7 @@ type AddDonorModalProps = {
 };
 
 export function AddDonorModal({ initialData, ...props }: AddDonorModalProps & ModalProps) {
-  const { mutateDonor } = useAddDonorWithFormValues(props.onClose);
+  const { mutateDonor, isLoading } = useAddDonorWithFormValues(props.onClose);
 
   const handleSave = (formValues: DonorFormValues) => {
     mutateDonor(formValues, initialData?.id);
@@ -18,7 +18,12 @@ export function AddDonorModal({ initialData, ...props }: AddDonorModalProps & Mo
 
   return (
     <Modal size={1000} title="Spender hinzufügen" {...props}>
-      <DonorForm handleSave={handleSave} initialData={initialData} onCancel={props.onClose} />
+      <DonorForm
+        handleSave={handleSave}
+        initialData={initialData}
+        onCancel={props.onClose}
+        isLoading={isLoading}
+      />
     </Modal>
   );
 }
