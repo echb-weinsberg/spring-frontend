@@ -3,7 +3,7 @@ import { Flex, Title, Button, TextInput } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { ListItemDonor, useDonors } from '@/api/queries/donors';
 import { AddDonorModal } from './AddDonorModal';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { IconChevronUp, IconSearch, IconSelector } from '@tabler/icons-react';
 import { useDonorsColumns } from './hooks/useDonorsColumns';
 import { useTablePaging } from '@/hooks/useTablePaging';
@@ -15,8 +15,22 @@ export function Donors() {
   const { data: donorsData, isLoading } = useDonors();
   const [opened, handlers] = useDisclosure(false);
   const [donorToUpdate, setDonorToUpdate] = useState<ListItemDonor | null>(null);
-  const [filter, setFilter] = useState<ListItemDonor[]>();
-  const donors = filter !== undefined ? filter : donorsData ?? [];
+  const [filter, setFilter] = useState<string>();
+  const filteredDonors = useMemo(() => {
+    if (!filter) return donorsData;
+    return fuzzySearch(
+      filter,
+      SEARCH_KEYS,
+      (donorsData ?? []).map((donor) => ({
+        ...donor,
+        attributes: {
+          ...donor.attributes,
+          combinedIbans: donor.attributes.ibans.join(' '),
+        },
+      }))
+    );
+  }, [donorsData, filter]);
+  const donors = filteredDonors ?? [];
 
   const columns = useDonorsColumns(setDonorToUpdate);
 
@@ -43,21 +57,7 @@ export function Donors() {
         leftSection={<IconSearch size="15" />}
         placeholder="Suche nach Name/IBAN"
         onChange={(event) =>
-          setFilter(
-            event.currentTarget.value
-              ? fuzzySearch(
-                  event.currentTarget.value,
-                  SEARCH_KEYS,
-                  (donorsData ?? []).map((donor) => ({
-                    ...donor,
-                    attributes: {
-                      ...donor.attributes,
-                      combinedIbans: donor.attributes.ibans.join(' '),
-                    },
-                  }))
-                )
-              : undefined
-          )
+          setFilter(event.currentTarget?.value?.length ? event.currentTarget.value : undefined)
         }
       />
       <DataTable

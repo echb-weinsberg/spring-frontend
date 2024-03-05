@@ -15,7 +15,7 @@ import { CsvImportModal } from './CsvImportModal';
 import { useDonors } from '@/api/queries/donors';
 import { useDonationsColumns } from './hooks/useDonationsColumns';
 import { downloadPdf, sortByName } from './helpers';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { fuzzySearch } from '@/helpers';
 import { useTablePaging } from '@/hooks/useTablePaging';
 import { PdfDocument } from '../PDF/PdfDocument';
@@ -39,8 +39,13 @@ export function Donations() {
   const receiptTemplates = useReceiptTemplates();
   const { data: donationsData, isLoading } = useDonations();
   const donors = useDonors();
-  const [filter, setFilter] = useState<ListItemDonation[]>();
-  const donations = filter !== undefined ? filter : donationsData ?? [];
+  const [filter, setFilter] = useState<string>();
+  const filteredDonations = useMemo(() => {
+    if (!filter) return donationsData;
+    return fuzzySearch(filter, SEARCH_KEYS, donationsData ?? []);
+  }, [donationsData, filter]);
+
+  const donations = filteredDonations ?? [];
 
   const [isLoadingPdf, setIsLoadingPdf] = useState(false);
   const [addEntryOpened, addEntryHandlers] = useDisclosure(false);
@@ -161,17 +166,12 @@ export function Donations() {
           onClose={() => setDonationToUpdate(null)}
         />
       )}
-
       <TextInput
         mb={10}
         leftSection={<IconSearch size="15" />}
         placeholder="Suche nach Name/Verwendungszweck"
         onChange={(event) =>
-          setFilter(
-            event.currentTarget.value
-              ? fuzzySearch(event.currentTarget.value, SEARCH_KEYS, donationsData ?? [])
-              : undefined
-          )
+          setFilter(event.currentTarget?.value?.length ? event.currentTarget.value : undefined)
         }
       />
 
