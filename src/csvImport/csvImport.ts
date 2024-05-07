@@ -29,7 +29,7 @@ export function parseFile(
 ) {
   Papa.parse(file, {
     header: true,
-    skipEmptyLines: true,
+    skipEmptyLines: 'greedy',
     complete: (results) => {
       onComplete(results as Papa.ParseResult<CsvLine>);
     },
