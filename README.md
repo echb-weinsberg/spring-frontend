@@ -1,3 +1,6 @@
+# Spring
+Spring is a donation management software for non-profit organizations in Germany. With Spring, donation entries can be maintained, and donation receipts can be automatically generated.
+
 # Mantine Vite template
 
 ## Features
