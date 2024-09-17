@@ -44,8 +44,6 @@ export function ReceiptPDF({
   templateType: TemplateType;
   logoUrl: string;
 }) {
-  //eslint-disable-next-line no-console
-  console.log(logoUrl);
   const [year] = useAtom(currentYearAtom);
 
   if (!donor || !donations) return null;
