@@ -1,6 +1,8 @@
 # Stage 1: Build the Vite project
 FROM node:18 as build
 
+ARG VITE_APP_CMS_URL
+
 # Set working directory
 WORKDIR /app
 
